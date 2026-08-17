@@ -8,7 +8,20 @@ reais para dólares.
 
 ## 19. Definir os contratos da integração
 
-O `product-service` consumirá este endpoint:
+O `cambio-service` consultará a HG Brasil exclusivamente pelo endpoint
+consolidado de finanças, passando a chave como parâmetro de consulta:
+
+```http
+GET https://api.hgbrasil.com/finance?key=SUA_CHAVE
+```
+
+Não use endpoints específicos de cotações, como `/finance/quotations`, nem os
+endpoints `/v2`: a chave utilizada nesta integração dá acesso somente a
+`/finance`. A cotação do dólar deve ser extraída de
+`results.currencies.USD` na resposta desse endpoint.
+
+Depois de consultar e persistir a cotação, o `cambio-service` a disponibilizará
+internamente. O `product-service` consumirá este endpoint local:
 
 ```http
 GET http://localhost:8100/cambio/dollar/latest
@@ -281,10 +294,11 @@ Defina `HG_BRASIL_API_KEY` no mesmo terminal antes de iniciar o `cambio-service`
 ### A HG Brasil responde com erro
 
 Confira a chave, a conexão com a internet e os limites do plano. Garanta também
-que a URL configurada continue sendo o endpoint consolidado `/finance`, sem
-substituí-lo por `/finance/quotations` ou `/v2/finance/quotes`. Enquanto a API
-externa estiver indisponível, a última cotação salva continuará sendo usada. Em
-um banco novo, ainda sem registros, `/cambio/dollar/latest` responderá `404`.
+que a requisição seja exatamente `GET https://api.hgbrasil.com/finance?key=...`,
+sem substituir `/finance` por `/finance/quotations` ou `/v2/finance/quotes`.
+Enquanto a API externa estiver indisponível, a última cotação salva continuará
+sendo usada. Em um banco novo, ainda sem registros,
+`/cambio/dollar/latest` responderá `404`.
 
 ### O produto convertido responde `503`
 
