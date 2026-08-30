@@ -47,19 +47,25 @@ partir dela.
 O `settings.gradle` da raiz é:
 
 ```groovy
-plugins {
-    id 'org.gradle.toolchains.foojay-resolver-convention' version '0.8.0'
-}
-
 rootProject.name = 'IntroducaoMicroServicos'
 
 include 'microservicos:product-service'
 include 'microservicos:cambio-service'
 ```
 
-O plugin Foojay permite que o Gradle baixe automaticamente um JDK 17 para os
-subprojetos (que declaram `JavaLanguageVersion.of(17)` no toolchain), mesmo que
-a versão do Java instalada na máquina seja outra — por exemplo, Java 21.
+> **Dica:** se a máquina não tiver o JDK 17 instalado (os subprojetos declaram
+> `JavaLanguageVersion.of(17)` no toolchain), o Gradle falhará ao compilar.
+> Nesse caso, adicione ao início do `settings.gradle` o plugin
+> [Foojay Toolchains Resolver](https://github.com/gradle/foojay-toolchains):
+>
+> ```groovy
+> plugins {
+>     id 'org.gradle.toolchains.foojay-resolver-convention' version '0.8.0'
+> }
+> ```
+>
+> Com ele, o Gradle baixa automaticamente um JDK 17 para o build, independente
+> da versão do Java instalada (por exemplo, Java 21).
 
 Para compilar e testar todos os microsserviços registrados:
 
