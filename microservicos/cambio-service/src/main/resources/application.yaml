@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: cambio-service
+  h2:
+    console:
+      enabled: true
+  datasource:
+    url: jdbc:h2:mem:cambiodb
+    driver-class-name: org.h2.Driver
+    username: aluno
+    password: fatec
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+
+server:
+  port: 8100
+
+hgbrasil:
+  base-url: https://api.hgbrasil.com
+  finance-path: /finance
+  api-key: ${HG_BRASIL_API_KEY:}
+
+currency:
+  update-rate-ms: ${CURRENCY_UPDATE_RATE_MS:600000}

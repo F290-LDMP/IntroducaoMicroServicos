@@ -1,3 +1,4 @@
 rootProject.name = 'IntroducaoMicroServicos'
 
 include 'microservicos:product-service'
+include 'microservicos:cambio-service'
