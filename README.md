@@ -26,7 +26,7 @@ Instale ou tenha disponível:
 - `curl`, Postman ou Insomnia para testar as APIs;
 - uma chave de integração da [HG Brasil](https://hgbrasil.com/docs/guide/key).
 
-O projeto usa o Gradle Wrapper. Portanto, não é necessário instalar o Gradle globalmente.
+O projeto usa o Gradle Wrapper 8.14.3. Portanto, não é necessário instalar o Gradle globalmente.
 
 Para conferir o Java:
 
