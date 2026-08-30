@@ -29,6 +29,15 @@ Adicione as dependências:
 
 Extraia o projeto em `microservicos/product-service`.
 
+> **Ajustes para o monorepo:** o arquivo gerado pelo Spring Initializr é um
+> projeto independente. Como o serviço será um subprojeto do monorepo, **remova
+> os artefatos de build do próprio serviço** — `gradlew`, `gradlew.bat`, a
+> pasta `gradle/` e o `settings.gradle` gerados. Todos os subprojetos
+> compartilham o wrapper e o `settings.gradle` da raiz, conforme descrito no
+> [README](../README.md#build-do-monorepo). Mantenha apenas `build.gradle` e
+> `src/`. Se preferir, crie os arquivos manualmente em vez de usar o
+> Initializr — o conteúdo necessário está todo neste guia.
+
 O arquivo `build.gradle` deve conter:
 
 ```groovy
@@ -57,6 +66,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+    implementation 'org.springframework.boot:spring-boot-starter-restclient'
     implementation 'org.springframework.boot:spring-boot-starter-flyway'
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'com.h2database:h2'
@@ -72,6 +82,30 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+```
+
+> **Por que `spring-boot-starter-restclient`?** A partir do Spring Boot 4, a
+> auto-configuração do `RestClient` (e do `RestTemplate`) foi movida do starter
+> web para o módulo `spring-boot-restclient`. O starter `webmvc` sozinho não
+> registra o bean `RestClient.Builder` usado na integração com o
+> `cambio-service` — sem esta dependência, a aplicação falha na inicialização
+> com `NoSuchBeanDefinitionException: RestClient$Builder`.
+
+Crie a classe principal `ProductServiceApplication.java` diretamente no pacote
+`br.com.fatecararas.product_service`:
+
+```java
+package br.com.fatecararas.product_service;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class ProductServiceApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(ProductServiceApplication.class, args);
+    }
 }
 ```
 
@@ -274,17 +308,16 @@ public class ProductResource {
 
 ## 9. Executar e testar o serviço de produtos
 
-Entre na pasta do serviço:
+Execute a partir da **raiz do monorepo** (onde está o `gradlew`):
 
 ```bash
-cd microservicos/product-service
-./gradlew bootRun
+./gradlew :microservicos:product-service:bootRun
 ```
 
 No Windows, use:
 
 ```powershell
-gradlew.bat bootRun
+.\gradlew.bat :microservicos:product-service:bootRun
 ```
 
 Em outro terminal, liste os produtos:

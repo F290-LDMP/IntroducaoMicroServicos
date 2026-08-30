@@ -20,6 +20,12 @@ No Spring Initializr, crie outro projeto com:
 
 Adicione Spring Web MVC, Spring Data JPA, H2 Database, Lombok e Actuator. Extraia em `microservicos/cambio-service`.
 
+> **Ajustes para o monorepo:** assim como no `product-service`, remova do
+> projeto gerado pelo Initializr os arquivos `gradlew`, `gradlew.bat`, a pasta
+> `gradle/` e o `settings.gradle`. O subprojeto usa o wrapper e o
+> `settings.gradle` da raiz do monorepo — veja o
+> [README](../README.md#build-do-monorepo).
+
 Use este `build.gradle`:
 
 ```groovy
@@ -47,6 +53,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+    implementation 'org.springframework.boot:spring-boot-starter-restclient'
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'com.h2database:h2'
     annotationProcessor 'org.projectlombok:lombok'
@@ -62,6 +69,12 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 ```
+
+> O `spring-boot-starter-restclient` é necessário porque o scheduler usa o
+> `RestClient` para chamar a HG Brasil. No Spring Boot 4, o starter `webmvc`
+> não inclui mais a auto-configuração do `RestClient.Builder` — sem este
+> starter, o contexto falha ao iniciar com
+> `NoSuchBeanDefinitionException: RestClient$Builder`.
 
 ## 11. Configurar o câmbio e a chave externa
 
@@ -368,12 +381,11 @@ public class DollarResource {
 
 ## 18. Executar e testar o câmbio
 
-Em um novo terminal:
+Em um novo terminal, a partir da **raiz do monorepo**:
 
 ```bash
-cd microservicos/cambio-service
 export HG_BRASIL_API_KEY="SUA_CHAVE"
-./gradlew bootRun
+./gradlew :microservicos:cambio-service:bootRun
 ```
 
 Consulte a cotação persistida:

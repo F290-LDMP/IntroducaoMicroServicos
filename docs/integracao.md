@@ -257,10 +257,17 @@ curl -i http://localhost:8000/product/1/dollar
 
 ## 25. Executar os testes automatizados básicos
 
-Em cada projeto, execute:
+Na raiz do monorepo, para testar todos os subprojetos de uma vez:
 
 ```bash
 ./gradlew test
+```
+
+Ou, para um serviço específico:
+
+```bash
+./gradlew :microservicos:product-service:test
+./gradlew :microservicos:cambio-service:test
 ```
 
 O teste de contexto do `cambio-service` pode ser executado sem uma chave real: o scheduler detectará a configuração vazia e não fará a chamada externa.
