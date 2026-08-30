@@ -2,6 +2,8 @@ package br.com.fatecararas.product_service.resources;
 
 import br.com.fatecararas.product_service.domain.entities.ProductEntity;
 import br.com.fatecararas.product_service.domain.repositories.ProductRepository;
+import br.com.fatecararas.product_service.resources.dto.ProductDollarResponse;
+import br.com.fatecararas.product_service.services.ProductConversionService;
 import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -24,6 +26,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 @RequestMapping("/product")
 public class ProductResource {
     private final ProductRepository repository;
+    private final ProductConversionService conversionService;
 
     @GetMapping("/{id}")
     public ResponseEntity<ProductEntity> findById(@PathVariable Integer id) {
@@ -59,5 +62,11 @@ public class ProductResource {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(products);
+    }
+
+    @GetMapping("/{id}/dollar")
+    public ResponseEntity<ProductDollarResponse> findInDollar(
+            @PathVariable Integer id) {
+        return ResponseEntity.ok(conversionService.convert(id));
     }
 }
