@@ -1,10 +1,11 @@
 # Introdução a microsserviços com Spring Boot
 
-Neste tutorial construiremos dois microsserviços e faremos uma comunicação síncrona entre eles:
+Neste tutorial construiremos dois microsserviços, faremos uma comunicação síncrona entre eles e adicionaremos um servidor de descoberta:
 
 - **product-service**: mantém o catálogo de produtos e seus preços em reais;
 - **cambio-service**: consulta periodicamente o endpoint público consolidado `/finance` da HG Brasil, extrai a cotação do dólar e mantém um histórico local;
 - ao solicitar um produto convertido, o `product-service` chama o `cambio-service` por HTTP e devolve o preço em dólares.
+- **discovery-service**: executa o Eureka Server, onde o `product-service` registra sua instância.
 
 ```text
 HG Brasil
@@ -13,6 +14,10 @@ GET /finance?key=...
     | atualização agendada
     v
 cambio-service :8100 <--- HTTP síncrono --- product-service :8000 <--- Cliente
+                                              |
+                                              | registro
+                                              v
+                                     discovery-service (Eureka) :8761
 ```
 
 > O objetivo da aula é observar a separação de responsabilidades, os bancos independentes e o efeito da indisponibilidade de um serviço sobre uma chamada síncrona.
@@ -40,9 +45,9 @@ Abra a pasta raiz `IntroducaoMicroServicos` como projeto Gradle na IDE. O
 `settings.gradle` da raiz registra cada microsserviço como um subprojeto.
 
 O wrapper e o `settings.gradle` ficam **somente na raiz**. Os subprojetos em
-`microservicos/` não possuem `gradlew`, `gradlew.bat`, `settings.gradle` nem a
-pasta `gradle/` próprios: todos compartilham o wrapper da raiz, que deve ser
-sempre invocado a partir dela.
+`microservicos/` e `spring-cloud/` não possuem `gradlew`, `gradlew.bat`,
+`settings.gradle` nem a pasta `gradle/` próprios: todos compartilham o wrapper
+da raiz, que deve ser sempre invocado a partir dela.
 
 Crie o `settings.gradle` da raiz apenas com o nome do projeto:
 
@@ -95,6 +100,7 @@ O código está organizado em branches temáticas, que correspondem aos guias:
 - `product-service`: somente a raiz do monorepo e o serviço de produtos;
 - `cambio-service`: somente a raiz do monorepo e o serviço de câmbio;
 - `integracao`: monorepo completo, com os dois serviços e a comunicação HTTP.
+- `spring-cloud`: adiciona o Eureka Server e o registro do `product-service`.
 
 Cada branch pode ser estudada de forma independente. Para a conversão de preços
 funcionar de ponta a ponta, use a branch `integracao`.
@@ -108,7 +114,7 @@ IntroducaoMicroServicos/
 ├── gradlew / gradlew.bat      # wrapper compartilhado (somente na raiz)
 ├── settings.gradle            # registra os subprojetos
 ├── gradle/wrapper/            # jar e properties do wrapper
-└── microservicos/                 # subprojetos sem wrapper próprio
+├── microservicos/                 # subprojetos sem wrapper próprio
     ├── product-service/
     │   ├── build.gradle
     │   └── src/
@@ -121,16 +127,26 @@ IntroducaoMicroServicos/
             └── main/
                 ├── java/br/com/fatecararas/cambio_service/
                 └── resources/
+└── spring-cloud/                  # subprojetos sem wrapper próprio
+    └── discovery-service/
+        ├── build.gradle
+        └── src/
+            └── main/
+                ├── java/dev/sdras/discoveryservice/
+                └── resources/
 ```
 
-Cada serviço será executado em um processo próprio e terá seu próprio banco H2 em memória.
+Cada aplicação será executada em um processo próprio. Os serviços de produtos e
+câmbio têm bancos H2 independentes em memória; o `discovery-service` apenas
+mantém o registro de instâncias em execução.
 
 ---
 
 ## Guias
 
-O tutorial foi separado em três guias, que devem ser seguidos nesta ordem:
+O tutorial foi separado em quatro guias, que devem ser seguidos nesta ordem:
 
 1. [`product-service`](docs/product-service.md) — criação do catálogo, banco, migrations e API REST.
 2. [`cambio-service`](docs/cambio-service.md) — consulta ao endpoint `/finance` da HG Brasil e histórico de cotações.
 3. [Integração entre os serviços](docs/integracao.md) — comunicação HTTP síncrona e conversão dos preços.
+4. [Eureka Server](docs/eureka-server.md) — registro do `product-service` e consulta ao servidor de descoberta.
