@@ -34,24 +34,34 @@ Para conferir o Java:
 java -version
 ```
 
-### Build do monorepo
+### Configurar o monorepo
 
 Abra a pasta raiz `IntroducaoMicroServicos` como projeto Gradle na IDE. O
 `settings.gradle` da raiz registra cada microsserviço como um subprojeto.
 
 O wrapper e o `settings.gradle` ficam **somente na raiz**. Os subprojetos em
-`microservicos/` não possuem `gradlew`, `settings.gradle` nem a pasta `gradle/`
-próprios: todos compartilham o wrapper da raiz, que deve ser sempre invocado a
-partir dela.
+`microservicos/` não possuem `gradlew`, `gradlew.bat`, `settings.gradle` nem a
+pasta `gradle/` próprios: todos compartilham o wrapper da raiz, que deve ser
+sempre invocado a partir dela.
 
-O `settings.gradle` da raiz é:
+Crie o `settings.gradle` da raiz apenas com o nome do projeto:
 
 ```groovy
 rootProject.name = 'IntroducaoMicroServicos'
-
-include 'microservicos:product-service'
-include 'microservicos:cambio-service'
 ```
+
+> **Não compile ainda.** Neste ponto os subprojetos ainda não existem — um
+> `./gradlew build` agora falharia por não haver nada para compilar. Cada guia a
+> seguir cria um serviço em `microservicos/`, registra-o no `settings.gradle`
+> com um novo `include ...` e só então demonstra a compilação e a execução do
+> serviço recém-criado. Ao adicionar outro serviço, registre-o no
+> `settings.gradle` da raiz seguindo o mesmo padrão.
+
+> **Onde está o wrapper?** O Gradle Wrapper 8.14.3 usado nos comandos é o
+> conjunto de arquivos da raiz (`gradlew`, `gradlew.bat`, `gradle/wrapper/`). Ele
+> já está versionado no repositório — durante a aula, copie-o de um dos branches
+> do projeto. Para gerá-lo do zero, instale o Gradle globalmente e execute
+> `gradle wrapper --gradle-version 8.14.3` na raiz.
 
 > **Dica:** se a máquina não tiver o JDK 17 instalado (os subprojetos declaram
 > `JavaLanguageVersion.of(17)` no toolchain), o Gradle falhará ao compilar.
@@ -67,26 +77,16 @@ include 'microservicos:cambio-service'
 > Com ele, o Gradle baixa automaticamente um JDK 17 para o build, independente
 > da versão do Java instalada (por exemplo, Java 21).
 
-Para compilar e testar todos os microsserviços registrados:
+Com os subprojetos criados e registrados no `settings.gradle`, estes comandos
+funcionam a partir da raiz:
 
-```bash
-./gradlew clean build
-```
+- compilar e testar todos os microsserviços registrados: `./gradlew clean build`;
+- executar somente o serviço de produtos: `./gradlew :microservicos:product-service:bootRun`;
+- executar somente o serviço de câmbio: `./gradlew :microservicos:cambio-service:bootRun`;
+- listar os subprojetos reconhecidos: `./gradlew projects`.
 
-Para executar somente o serviço de produtos:
-
-```bash
-./gradlew :microservicos:product-service:bootRun
-```
-
-Para listar os subprojetos reconhecidos pelo Gradle:
-
-```bash
-./gradlew projects
-```
-
-Ao adicionar outro serviço, registre-o no `settings.gradle` da raiz seguindo o
-mesmo padrão usado pelo `product-service`.
+A compilação e a execução de cada serviço são demonstradas nos próprios guias,
+no momento em que cada subprojeto é criado.
 
 ### Branches do repositório
 
@@ -108,9 +108,9 @@ IntroducaoMicroServicos/
 ├── gradlew / gradlew.bat      # wrapper compartilhado (somente na raiz)
 ├── settings.gradle            # registra os subprojetos
 ├── gradle/wrapper/            # jar e properties do wrapper
-└── microservicos/
+└── microservicos/                 # subprojetos sem wrapper próprio
     ├── product-service/
-    │   ├── build.gradle       # sem wrapper nem settings.gradle próprios
+    │   ├── build.gradle
     │   └── src/
     │       └── main/
     │           ├── java/br/com/fatecararas/product_service/

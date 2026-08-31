@@ -24,7 +24,17 @@ Adicione Spring Web MVC, Spring Data JPA, H2 Database, Lombok e Actuator. Extrai
 > projeto gerado pelo Initializr os arquivos `gradlew`, `gradlew.bat`, a pasta
 > `gradle/` e o `settings.gradle`. O subprojeto usa o wrapper e o
 > `settings.gradle` da raiz do monorepo — veja o
-> [README](../README.md#build-do-monorepo).
+> [README](../README.md#configurar-o-monorepo).
+
+Agora registre o subprojeto no `settings.gradle` da raiz, adicionando a linha do
+`cambio-service`:
+
+```groovy
+rootProject.name = 'IntroducaoMicroServicos'
+
+include 'microservicos:product-service'
+include 'microservicos:cambio-service'
+```
 
 Use este `build.gradle`:
 
@@ -381,7 +391,14 @@ public class DollarResource {
 
 ## 18. Executar e testar o câmbio
 
-Em um novo terminal, a partir da **raiz do monorepo**:
+Com o subprojeto registrado no `settings.gradle`, compile-o a partir da **raiz
+do monorepo**. O primeiro build baixa as dependências:
+
+```bash
+./gradlew :microservicos:cambio-service:build
+```
+
+Em um novo terminal, execute o serviço:
 
 ```bash
 export HG_BRASIL_API_KEY="SUA_CHAVE"

@@ -34,9 +34,17 @@ Extraia o projeto em `microservicos/product-service`.
 > os artefatos de build do próprio serviço** — `gradlew`, `gradlew.bat`, a
 > pasta `gradle/` e o `settings.gradle` gerados. Todos os subprojetos
 > compartilham o wrapper e o `settings.gradle` da raiz, conforme descrito no
-> [README](../README.md#build-do-monorepo). Mantenha apenas `build.gradle` e
+> [README](../README.md#configurar-o-monorepo). Mantenha apenas `build.gradle` e
 > `src/`. Se preferir, crie os arquivos manualmente em vez de usar o
 > Initializr — o conteúdo necessário está todo neste guia.
+
+Agora registre o subprojeto no `settings.gradle` da raiz:
+
+```groovy
+rootProject.name = 'IntroducaoMicroServicos'
+
+include 'microservicos:product-service'
+```
 
 O arquivo `build.gradle` deve conter:
 
@@ -308,7 +316,14 @@ public class ProductResource {
 
 ## 9. Executar e testar o serviço de produtos
 
-Execute a partir da **raiz do monorepo** (onde está o `gradlew`):
+Com o subprojeto registrado no `settings.gradle`, compile-o a partir da **raiz
+do monorepo** (onde está o `gradlew`). O primeiro build baixa as dependências:
+
+```bash
+./gradlew :microservicos:product-service:build
+```
+
+Execute o serviço:
 
 ```bash
 ./gradlew :microservicos:product-service:bootRun
